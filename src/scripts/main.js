@@ -18,38 +18,55 @@
   
   resizeCanvas();
         
-  function drawStuff() {
-// add logo
-	let img = new Image();
-		img.onload = function() {
+function drawStuff() {
 
-	if (canvas.width > canvas.height)
-		{  // Screen width is wider than screen height, we will scale to screen height
-		scaledratio =  (canvas.height * 0.2);
-		}
-	else
-		{  // Screen height is wider than screen width, we will match the screen width
-		scaledratio =  (canvas.width * 0.2);
-		}
+let img = new Image();
+img.src = 'https://raw.githubusercontent.com/HerbFargus/plymouth-to-canvas/main/src/images/spritesheet.png';
+img.onload = function() {
+  init();
+};
 
-	var x = (canvas.width - scaledratio) / 2;
-	var y = (canvas.height - scaledratio) / 2;
-	context.drawImage(img, x, y, scaledratio, scaledratio); // drw image with scaled width and height
+let canvas = document.querySelector('canvas');
+let ctx = canvas.getContext('2d');
 
-	};
+const scale = 1;
+const width = 100;
+const height = 100;
+const canvaswidth = canvas.width;
+const canvasheight = canvas.height;
+const scaledWidth = scale * width;
+const scaledHeight = scale * height;
 
-// animate ship
-	let spritesheet = new Image();
-		spritesheet.onload = function() {
-// get the position is half of the canvas width minus the scaled width of the image 
-	var scale = (.5);
-	var x = (canvas.width - spritesheet.width * scale) / 2;
-	var y = (canvas.height - spritesheet.height * scale) / 2;
-	context.drawImage(spritesheet, x, y, spritesheet.width * scale, spritesheet.height * scale); // drw image with scaled width and height	
+function drawFrame(frameX, frameY, canvasX, canvasY) {
+  ctx.drawImage(img,
+                frameX * width, frameY * height, width, height,
+                ((canvaswidth / 2) - (width/2) ), ((canvasheight / 2) - (width/2)), scaledWidth, scaledHeight);
+}
 
-	};
-		img.src = '../images/retropie_logo_wireframe.png';
-		spritesheet.src = '../images/spritesheet.png';
+const cycleLoop = [5, 6];
+let currentLoopIndex = 0;
+let frameCount = 0;
 
-	}
+function step() {
+  frameCount++;
+  if (frameCount < 5) {
+    window.requestAnimationFrame(step);
+    return;
+  }
+  frameCount = 0;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawFrame(cycleLoop[currentLoopIndex], 0, 0, 0);
+  currentLoopIndex++;
+  if (currentLoopIndex >= cycleLoop.length) {
+    currentLoopIndex = 0;
+  }
+  window.requestAnimationFrame(step);
+}
+
+function init() {
+  window.requestAnimationFrame(step);
+}
+
+};
+
 })();
